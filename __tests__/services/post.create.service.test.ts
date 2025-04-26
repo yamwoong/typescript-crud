@@ -1,15 +1,19 @@
-import mongoose from 'mongoose';
 import Post from '../../src/models/postModel';
 import {createPostService} from '../../src/services/post.service';
 
+
 describe('createPostService', () => {
+    // afterEach: Clean up DB after each test (각 테스트 후 DB 초기화)
+    afterEach(async () => {
+        await Post.deleteMany({}); 
+    })
+
     it('should create and return a post (게시글을 생성하고 반환해야 한다)', async() => {
-        // Arrange: Define the input data for post creation (준비: 게시글 생성에 사용할 입력 데이터 정의)
+        // Arrange: Define input data for post creation (준비: 입력 데이터 정의)
         const mockInput = {title: 'Test Title', content: 'This is a test content.'};
 
-        // Act: Call the createPostService with mock input (실행: 서비스 함수를 호출)
+        // Act: Call the createPostService with mock input (실행: 서비스 함수 호출)
         const createdPost = await createPostService(mockInput);
-        console.log('Created post (생성된 게시글):', createdPost);
 
         // Assert: Verify the result matches expectations (검증: 기대값과 일치하는지 확인)
         expect(createdPost).toBeDefined(); // Should return a defined object (반환된 객체가 정의되어 있어야 함)
@@ -19,7 +23,6 @@ describe('createPostService', () => {
 
         // Optionally: Check if document actually exists in DB (선택적으로 DB에 문서가 실제로 존재하는지 확인)
         const found = await Post.findById(createdPost._id);
-        console.log('Found post in DB (DB에서 조회된 게시글):', found);
         expect(found).not.toBeNull(); // Should exist in DB (DB에 존재해야 함)
     });
 });

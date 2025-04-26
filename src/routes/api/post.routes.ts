@@ -1,5 +1,6 @@
 import {Router} from 'express';
-import {createPost, getAllPosts, getPostById} from '../../controllers/post.controller';
+import {createPost, getAllPosts, getPostById, updatePost, deletePost} from '../../controllers/post.controller';
+import {asyncHandler} from '../../middlewares/asyncHandler';
 
 const router = Router();
 
@@ -8,20 +9,34 @@ const router = Router();
  * @desc    Create a new post (게시글 생성)
  * @access  Public (공개)
  */
-router.post('/', createPost);
+router.post('/', asyncHandler(createPost));
 
 /**
  * @route   GET /api/posts
  * @desc    Get all posts (전체 게시글 조회)
  * @access  Public (공개)
  */
-router.get('/', getAllPosts);
+router.get('/', asyncHandler(getAllPosts));
 
 /**
  * @route   GET /api/posts/:id
- * @desc    Get post by ID
- * @access  Public
+ * @desc    Get a post by ID (ID로 특정 게시글 조회)
+ * @access  Public (공개)
  */
-router.get('/:id', getPostById)
+router.get('/:id', asyncHandler(getPostById));
+
+/**
+ * @route   PUT /api/posts/:id
+ * @desc    Update a post by ID (ID로 게시글 수정)
+ * @access  Public (공개)
+ */
+router.put('/:id', asyncHandler(updatePost));
+
+/**
+ * @route   DELETE /api/posts/:id
+ * @desc    Delete a post by ID (ID로 게시글 삭제)
+ * @access  Public (공개)
+ */
+router.delete('/:id', asyncHandler(deletePost));
 
 export default router;
