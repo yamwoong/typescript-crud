@@ -26,6 +26,6 @@ describe('getPostByIdService', () => {
     const fakeId = new Post()._id.toString();
 
     // Act & Assert: expect NotFoundError to be thrown
-    await expect(getPostByIdService(fakeId)).rejects.toThrow(NotFoundError)
+    await expect(getPostByIdService(fakeId)).rejects.toThrow(NotFoundError);
   });
 });

@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {createPost, getAllPosts, getPostById, updatePost, deletePost} from '../../controllers/post.controller';
 import {asyncHandler} from '../../middlewares/asyncHandler';
+import {createPostValidator, updatePostValidator} from '../../validation/post.validation';
 
 const router = Router();
 
@@ -9,7 +10,7 @@ const router = Router();
  * @desc    Create a new post (게시글 생성)
  * @access  Public (공개)
  */
-router.post('/', asyncHandler(createPost));
+router.post('/', createPostValidator, asyncHandler(createPost));
 
 /**
  * @route   GET /api/posts
@@ -30,7 +31,7 @@ router.get('/:id', asyncHandler(getPostById));
  * @desc    Update a post by ID (ID로 게시글 수정)
  * @access  Public (공개)
  */
-router.put('/:id', asyncHandler(updatePost));
+router.put('/:id', updatePostValidator, asyncHandler(updatePost));
 
 /**
  * @route   DELETE /api/posts/:id

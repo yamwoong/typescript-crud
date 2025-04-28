@@ -1,19 +1,28 @@
-import {UnauthorizedError} from '../../src/errors/UnauthorizedError';
+import { UnauthorizedError } from '../../src/errors/UnauthorizedError';
+import { AppError } from '../../src/errors/AppError';
 
-describe('UnexpectedError', () => {
-    it('should create an instance with correct properties', () => {
-        const error = new UnauthorizedError('Not allowed');
+describe('UnauthorizedError', () => {
+  it('should default to 401 status code and operational=true', () => {
+    const err = new UnauthorizedError();
 
-        expect(error).toBeInstanceOf(Error); // Check if it's an instance of Error (Error 클래스인지 확인)
-        expect(error).toBeInstanceOf(UnauthorizedError); // Check if it's an instance of UnauthorizedError (UnauthorizedError 클래스인지 확인)
-        expect(error.message).toBe('Not allowed');  // Check the custom message (커스텀 메시지 확인)
-        expect(error.statusCode).toBe(401);  // Check the status code (상태 코드 확인)
-    });
+    // Check instance types (인스턴스 타입 확인)
+    expect(err).toBeInstanceOf(UnauthorizedError); // Check if it is an instance of UnauthorizedError (UnauthorizedError 클래스인지 확인)
+    expect(err).toBeInstanceOf(AppError);          // Check if it is an instance of AppError (AppError의 인스턴스인지 확인)
 
-    it('should use default message if none is provided', () => {
-        const error = new UnauthorizedError();
+    // Check default message and status code (기본 메시지와 상태 코드 확인)
+    expect(err.message).toBe('Unauthorized');      // Default message should be 'Unauthorized' (기본 메시지는 'Unauthorized'여야 함)
+    expect(err.statusCode).toBe(401);              // Default status code should be 401 (기본 상태 코드는 401여야 함)
 
-        expect(error.message).toBe('Unauthorized'); // Check default message (기본 메시지 확인)
-        expect(error.statusCode).toBe(401); // Check default status code (기본 상태 코드 확인)
-    });
+    // Check operational flag (운영 오류 플래그 확인)
+    expect(err.isOperational).toBe(true);          // Should be marked as operational (운영 오류로 표시되어야 함)
+  });
+
+  it('should accept a custom message', () => {
+    const err = new UnauthorizedError('No token provided');
+
+    // Check custom message and defaults (커스텀 메시지 및 기본값 확인)
+    expect(err.message).toBe('No token provided'); // Message should reflect custom input (메시지는 커스텀 입력을 반영해야 함)
+    expect(err.statusCode).toBe(401);              // Status code remains 401 (상태 코드는 여전히 401)
+    expect(err.isOperational).toBe(true);          // Still marked as operational (여전히 운영 오류로 표시됨)
+  });
 });

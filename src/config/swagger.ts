@@ -1,27 +1,17 @@
-import swaggerJSDoc from 'swagger-jsdoc';
+import path from 'path';
+import YAML from 'yamljs';
 import swaggerUi from 'swagger-ui-express';
+import type { Express } from 'express';
 
-const options = {
-    definition: {
-      openapi: '3.0.0',
-      info: {
-        title: 'Post CRUD API',
-        version: '1.0.0',
-        description: 'A simple CRUD API for managing posts built with Express and TypeScript',
-      },
-      servers: [
-        {
-          url: 'http://localhost:3000',
-          description: 'Local dev server',
-        },
-      ],
-    },
-    apis: ['./src/routes/*.ts', './src/controllers/*.ts']
-  };
+// Load the YAML file (YAML 파일 로드)
+const swaggerSpec = YAML.load(path.join(__dirname, '../../swagger/swagger.yaml'));
 
-const swaggerSpec = swaggerJSDoc(options);
+/**
+ * Mounts Swagger UI under /api-docs
+ * @param app Express application instance
+ */
 
-export {
-    swaggerUi,
-    swaggerSpec
-};
+export function setupSwagger(app: Express) {
+  // Serve Swagger UI at /api-docs (Swagger UI를 /api-docs에 마운트)
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
