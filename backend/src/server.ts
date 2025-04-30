@@ -1,11 +1,15 @@
 // src/server.ts
 import http from 'http';                                                      // Node HTTP module (Node HTTP 모듈)
 import { createApp } from './app';                                            // App factory function (앱 팩토리 함수)
-import { config } from './config/config';                                     // Environment configuration (환경 설정)
+import connectDB from './config/mongo';                                     // Environment configuration (환경 설정)
+
 
 const PORT = process.env.PORT || 3000;                                         // Port number (포트 번호)
 
 async function startServer(): Promise<void> {                                  // Async startup for error handling (예외 처리를 위한 async 시작 함수)
+  
+  await connectDB();
+
   const app = createApp();                                                    // Build Express app (Express 앱 생성)
   const server = http.createServer(app);                                       // Wrap app in HTTP server (HTTP 서버 래핑)
 

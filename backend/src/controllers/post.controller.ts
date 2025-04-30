@@ -32,7 +32,7 @@ export const createPost = asyncHandler(async (req: Request, res: Response) => {
    * GET /api/posts/:id
    */
   export const getPostById = asyncHandler(async (req: Request, res: Response) => {
-    const post = await getAllPostsService(); // typo? actually should call getPostByIdService
+    const post = await getPostByIdService(req.params.id);
     res.status(200).json({ post });
   });
   
