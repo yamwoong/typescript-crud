@@ -4,14 +4,14 @@
 FROM node:18 AS builder
 WORKDIR /app
 
-# Copy dependency definitions only to leverage Docker cache
-COPY package*.json ./
+# Copy package.json, package-lock.json (or yarn.lock) AND tsconfig.json to leverage Docker cache
+COPY package*.json tsconfig.json ./
+
 # Install all dependencies (including devDependencies)
 RUN npm install
 
-# Copy all source code into the container
+# Copy the rest of the source code and build
 COPY . .
-# Run the build script to transpile TypeScript to JavaScript
 RUN npm run build
 
 
@@ -19,16 +19,16 @@ RUN npm run build
 FROM node:18-slim
 WORKDIR /app
 
-# Copy the built output from the builder stage
+# Copy the built output and swagger files from the builder stage
 COPY --from=builder /app/dist ./dist
-# Copy Swagger specification files for runtime usage
 COPY --from=builder /app/swagger ./swagger
-# Copy package.json to prepare for production install
+
+# Copy only package.json files to install production deps
 COPY package*.json ./
-# Install only production dependencies
 RUN npm install --production
 
 # Expose port 3000 for incoming requests
 EXPOSE 3000
-# Start the application by running the compiled server
+
+# Start the application
 CMD ["node", "dist/server.js"]
