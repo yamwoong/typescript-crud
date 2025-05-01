@@ -1,0 +1,36 @@
+name: CI/CD Pipeline                                                  # The display name of this workflow (이 워크플로우의 표시 이름)
+
+on:                                                                   # Events that trigger the workflow (워크플로우를 트리거하는 이벤트)
+  push:                                                               # Trigger on push events (푸시 이벤트에서 트리거)
+    branches: 
+      - main                                                          # Only when pushing to the main branch (main 브랜치로 푸시될 때만)
+
+jobs:                                                                 # Define one or more jobs (하나 이상의 잡 정의)
+  build-and-push:                                                     # Identifier for this job (이 잡의 식별자)
+    runs-on: ubuntu-latest                                            # Run on the latest Ubuntu runner (최신 우분투 러너에서 실행)
+
+    steps:                                                            # A sequence of steps to execute (실행할 단계들의 순서)
+      - name: Checkout code                                           # Step name shown in Actions UI (Actions UI에 표시될 단계 이름)
+        uses: actions/checkout@v3                                     # Use the checkout action to clone the repo (리포를 클론하기 위한 checkout 액션 사용)
+
+      - name: Login to Docker Hub                                     # Docker Hub 로그인 (로그인 단계 이름)
+        uses: docker/login-action@v2                                  # Official Docker login action (Docker 공식 로그인 액션)
+        with:                                                         # Inputs for the login action (로그인 액션에 대한 입력값)
+          username: ${{ secrets.DOCKER_USERNAME }}                    # Docker Hub username from secrets (시크릿에 저장된 Docker Hub 사용자명)
+          password: ${{ secrets.DOCKER_PASSWORD }}                    # Docker Hub password (or PAT) from secrets (시크릿에 저장된 비밀번호 또는 토큰)
+
+      - name: Build and push backend                                  # Build & push backend image (백엔드 이미지 빌드 및 푸시)
+        uses: docker/build-push-action@v4                             # Official Docker build-and-push action (Docker 공식 빌드 앤 푸시 액션)
+        with:
+          context: ./backend                                          # Path to backend source (백엔드 소스 위치)
+          file:    ./backend/Dockerfile                               # Dockerfile for backend (백엔드용 Dockerfile 경로)
+          push:    true                                               # Push the built image to registry (이미지를 레지스트리에 푸시)
+          tags:    your-dockerhub-username/ts-crud-backend:latest     # Image tag in Docker Hub (Docker Hub에 저장될 이미지 태그)
+
+      - name: Build and push frontend                                 # Build & push frontend image (프론트엔드 이미지 빌드 및 푸시)
+        uses: docker/build-push-action@v4                             # Same build-and-push action for frontend (프론트엔드에도 동일 액션 사용)
+        with:
+          context: ./frontend                                         # Path to frontend source (프론트엔드 소스 위치)
+          file:    ./frontend/Dockerfile                              # Dockerfile for frontend (프론트엔드용 Dockerfile 경로)
+          push:    true                                               # Push the built image to registry (이미지를 레지스트리에 푸시)
+          tags:    your-dockerhub-username/ts-crud-frontend:latest    # Image tag in Docker Hub (Docker Hub에 저장될 이미지 태그)
