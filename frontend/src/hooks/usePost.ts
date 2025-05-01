@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
-import type { Post } from '../api/generated/models/Post';
-import { DefaultService } from '../api/generated/services/DefaultService';
+import { useState, useEffect } from "react";
+import { DefaultService } from "../api/generated";
+import type { Post } from "../api/generated/models/Post";
 
-/**
- * Fetch a single post by ID (ID로 게시글 단건 조회)
- * @param id Post ID (게시글 ID)
- */
-export function usePost(id: string) {
+export const usePost = (id: string) => {
   const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    DefaultService.getApiPosts1(id)
-      .then(response => {
-        console.log('📦 API 응답:', response);         // 전체 응답
-      console.log('🧩 response.post:', response.post); // post 객체
-        if (response.post) {
-          setPost(response.post);
-        } else {
-          throw new Error('Post not found');
-        }
-      })
-      .catch(err => setError(err))
-      .finally(() => setLoading(false));
+    const fetchPost = async () => {
+      try {
+        setLoading(true);
+        const response = await DefaultService.getApiPosts1(id); // ✅ 올바른 메서드
+        setPost(response.post ?? null); // ✅ 올바른 응답 구조
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to fetch post");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchPost();
+    }
   }, [id]);
 
   return { post, loading, error };
-}
+};

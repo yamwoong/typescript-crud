@@ -1,25 +1,47 @@
-import { usePosts } from '../hooks/usePosts';
-import { Link } from 'react-router-dom';
+import type React from "react";
+import { usePosts } from "../hooks/usePosts";
+import { PostCard } from "../components/PostCard";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
+import { useNavigate, Link } from "react-router-dom";
 
-export function PostList() {
+export const PostList: React.FC = () => {
   const { posts, loading, error } = usePosts();
+  const navigate = useNavigate();
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  const handlePostClick = (id: string) => {
+    navigate(`/posts/${id}`);
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
     <div>
-      <h2>Posts</h2>
-      <Link to="/posts/new">✏️ 새 글 작성</Link> {/* ✅ 작성 버튼 추가 */}
-      <ul>
-        {posts.map((post) => (
-          <li key={post._id}>
-            <Link to={`/posts/${post._id}`}>{post.title}</Link>
-            {' '}
-            <Link to={`/posts/${post._id}/edit`}>🛠 수정</Link> {/* ✅ 수정 링크 추가 */}
-          </li>
-        ))}
-      </ul>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-blue-600">All Posts</h1>
+        <Link to="/posts/new" className="btn btn-primary">
+          Create Post
+        </Link>
+      </div>
+
+      {posts.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="text-gray-500 text-lg">
+            No posts available. Why not create the first one?
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <PostCard
+              key={post._id}
+              post={post}
+              onClick={() => handlePostClick(post._id!)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
-}
+};

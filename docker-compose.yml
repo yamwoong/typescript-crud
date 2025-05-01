@@ -1,0 +1,35 @@
+# docker-compose.yml
+
+# Version of the Compose file format
+version: '3.8'  # Specifies the version of the compose file syntax
+
+services:
+  mongo:  # MongoDB service definition
+    image: mongo:6  # Use the official MongoDB v6 image
+    restart: always  # Automatically restart container on failure
+    ports:
+      - "27017:27017"  # Map host port 27017 to container port 27017
+    volumes:
+      - mongo-data:/data/db  # Persist MongoDB data in a named volume
+
+  backend:  # Backend (Express/TypeScript) service definition
+    build:
+      context: ./backend  # Build Docker image using the Dockerfile in ./backend
+    ports:
+      - "3000:3000"  # Map host port 3000 to container port 3000
+    environment:  # Environment variables injected into the container
+      - PORT=3000  # Port on which the Express server listens
+      - MONGO_URI=mongodb://mongo:27017/ts-crud  # MongoDB connection string (using the `mongo` service)
+    depends_on:
+      - mongo  # Ensure MongoDB service is up before starting the backend
+
+  frontend:  # Frontend (React/Nginx) service definition
+    build:
+      context: ./frontend  # Build Docker image using the Dockerfile in ./frontend
+    ports:
+      - "3001:80"  # Map host port 3001 to container port 80 where Nginx serves static files
+    depends_on:
+      - backend  # Ensure backend service is available before starting the frontend
+
+volumes:
+  mongo-data: {}  # Named volume for persisting MongoDB data
