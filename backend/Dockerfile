@@ -1,16 +1,15 @@
-# backend/Dockerfile
-
 # ===== Stage 1: Build =====
 FROM node:18 AS builder
 WORKDIR /app
 
-# Copy package.json, package-lock.json (or yarn.lock) AND tsconfig.json to leverage Docker cache
+# package.json, tsconfig.json 복사 및 npm 설치
 COPY package*.json tsconfig.json ./
-
-# Install all dependencies (including devDependencies)
 RUN npm install
 
-# Copy the rest of the source code and build
+# node_modules/.bin을 PATH에 추가
+ENV PATH /app/node_modules/.bin:$PATH
+
+# 소스 코드 복사 및 빌드
 COPY . .
 RUN npm run build
 
@@ -18,16 +17,16 @@ RUN npm run build
 FROM node:18-slim
 WORKDIR /app
 
-# Copy the built output and swagger files from the builder stage
+# 빌드 출력물 및 swagger 파일 복사
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/swagger ./swagger
 
-# Copy only package.json files to install production deps
+# package.json 복사 및 프로덕션 의존성 설치
 COPY package*.json ./
 RUN npm install --production
 
-# Expose port 3000 for incoming requests
+# 포트 3000 노출
 EXPOSE 3000
- 
-# Start the application
-CMD ["node", "dist/server.js"]  
+
+# 애플리케이션 실행
+CMD ["node", "dist/server.js"]
