@@ -2,14 +2,17 @@
 FROM node:18 AS builder
 WORKDIR /app
 
-# package.json, tsconfig.json 복사 및 npm 설치
+# package.json과 tsconfig.json 복사 및 의존성 설치
 COPY package*.json tsconfig.json ./
 RUN npm install
 
-# node_modules/.bin을 PATH에 추가
+# node_modules/.bin 디렉터리에 실행 권한 추가
+RUN chmod -R +x /app/node_modules/.bin
+
+# PATH 환경 변수에 node_modules/.bin 추가
 ENV PATH /app/node_modules/.bin:$PATH
 
-# 소스 코드 복사 및 빌드
+# 소스 코드 복사 및 빌드 실행
 COPY . .
 RUN npm run build
 
@@ -17,7 +20,7 @@ RUN npm run build
 FROM node:18-slim
 WORKDIR /app
 
-# 빌드 출력물 및 swagger 파일 복사
+# 빌드 결과물(dist)과 swagger 파일 복사
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/swagger ./swagger
 
