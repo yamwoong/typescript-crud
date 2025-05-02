@@ -2,13 +2,13 @@ FROM node:18
 
 WORKDIR /app
 
-# package.json + lock 복사
+# package.json 및 lock 파일 복사
 COPY package.json package-lock.json ./
 
-# 의존성 설치 + rimraf 전역 설치
-RUN npm install && npm install -g rimraf
+# 의존성 + typescript + rimraf 글로벌 설치
+RUN npm install && npm install -g typescript rimraf
 
-# 나머지 소스 복사
+# 전체 소스 복사
 COPY . .
 
 # 빌드 (clean 포함)
