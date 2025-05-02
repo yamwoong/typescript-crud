@@ -14,4 +14,4 @@ COPY . .
 # 빌드 (clean 포함)
 RUN npm run build
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/server.js"]
