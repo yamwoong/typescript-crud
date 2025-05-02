@@ -28,6 +28,6 @@ RUN npm install --production
 
 # Expose port 3000 for incoming requests
 EXPOSE 3000
-
+ 
 # Start the application
 CMD ["node", "dist/server.js"]
